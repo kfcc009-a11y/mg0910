@@ -12,7 +12,7 @@
     .topbar{height:5px;background:linear-gradient(90deg,var(--mg),#0087cf 64%,#19a36b)}
     header{background:#fff;border-bottom:1px solid var(--line)} .header-inner{max-width:1440px;margin:auto;padding:18px 28px;display:flex;align-items:center;justify-content:space-between;gap:18px}
     .brand{display:flex;align-items:center;gap:13px}.brand-mark{width:42px;height:42px;border-radius:13px;background:var(--mg);color:#fff;display:grid;place-items:center;font-weight:900;letter-spacing:-1px;box-shadow:0 7px 15px rgba(0,91,172,.2)}
-    h1{font-size:1.28rem;margin:0;letter-spacing:-.04em}.eyebrow{font-size:.78rem;color:var(--mg);font-weight:800;letter-spacing:.08em;margin-bottom:2px}.header-note{font-size:.8rem;color:var(--muted);text-align:right}
+    h1{font-size:1.28rem;margin:0;letter-spacing:-.04em}.eyebrow{font-size:.78rem;color:var(--mg);font-weight:800;letter-spacing:.08em;margin-bottom:2px}.header-actions{display:flex;align-items:center;gap:14px}.header-note{font-size:.8rem;color:var(--muted);text-align:right}.page-link{display:inline-flex;align-items:center;justify-content:center;min-width:76px;padding:10px 16px;border-radius:10px;background:var(--mg);color:#fff;text-decoration:none;font-size:.82rem;font-weight:850;box-shadow:0 6px 14px rgba(0,91,172,.18)}.page-link:hover{background:var(--mg-dark)}.page-link:focus-visible{outline:3px solid #55aaf3;outline-offset:3px}
     main{max-width:1440px;margin:auto;padding:26px 28px 52px}.workspace{display:grid;grid-template-columns:minmax(310px,390px) minmax(0,1fr);gap:22px;align-items:start}
     .panel{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}.inputs{padding:24px;position:sticky;top:18px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:21px}.section-head h2{font-size:1.08rem;margin:0;letter-spacing:-.035em}.section-head p{font-size:.78rem;color:var(--muted);margin:0}
     .field{margin-bottom:22px}.field:last-child{margin-bottom:0}.label-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}.label-row label,.field>label{font-size:.9rem;font-weight:800}.hint{font-size:.75rem;color:var(--muted)}
@@ -26,7 +26,7 @@
     .table-wrap{overflow:auto;border-top:1px solid var(--line);max-height:525px}table{width:100%;border-collapse:collapse;min-width:680px;font-variant-numeric:tabular-nums}th{position:sticky;top:0;z-index:1;background:#f4f8fc;color:#526477;font-size:.75rem;text-align:right;padding:12px 18px;border-bottom:1px solid var(--line)}th:first-child,td:first-child{text-align:center}td{text-align:right;padding:12px 18px;border-bottom:1px solid #edf1f5;font-size:.83rem}tbody tr:hover{background:#f8fbfe}td.payment{font-weight:850;color:var(--mg-dark)}tfoot td{position:sticky;bottom:0;background:#f0f6fc;font-weight:850;border-top:1px solid #cadbe9;border-bottom:0}
     .notice{display:flex;gap:9px;margin-top:14px;padding:0 4px;color:#6e7d8c;font-size:.73rem}.notice svg{flex:0 0 auto;margin-top:2px}.mobile-summary{display:none}.no-js{padding:20px;text-align:center;color:#a22}
     @media(max-width:1000px){.workspace{grid-template-columns:1fr}.inputs{position:static}.compare-grid{grid-template-columns:1fr 1fr 1fr}}
-    @media(max-width:720px){.header-inner{padding:14px 16px}.header-note{display:none}main{padding:16px 14px 36px}.panel{border-radius:16px}.inputs{padding:20px}.compare-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:7px}.compare-card{min-width:82%;scroll-snap-align:start}.summary-head{align-items:flex-start;flex-direction:column;gap:3px}.schedule-top{padding:18px;align-items:flex-start;flex-direction:column}.table-wrap{max-height:470px}th,td{padding:11px 13px}.notice{padding:0 2px}.brand-mark{width:38px;height:38px;border-radius:11px}h1{font-size:1.08rem}}
+    @media(max-width:720px){.header-inner{padding:14px 16px}.header-note{display:none}.page-link{min-width:66px;padding:9px 13px}main{padding:16px 14px 36px}.panel{border-radius:16px}.inputs{padding:20px}.compare-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:7px}.compare-card{min-width:82%;scroll-snap-align:start}.summary-head{align-items:flex-start;flex-direction:column;gap:3px}.schedule-top{padding:18px;align-items:flex-start;flex-direction:column}.table-wrap{max-height:470px}th,td{padding:11px 13px}.notice{padding:0 2px}.brand-mark{width:38px;height:38px;border-radius:11px}h1{font-size:1.08rem}}
     @media(max-width:390px){.quick{grid-template-columns:1fr}.method-tabs button{font-size:.7rem}.inputs{padding:17px}.major{font-size:1.35rem}}
     @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
   </style>
@@ -35,7 +35,7 @@
   <div class="topbar"></div>
   <header><div class="header-inner">
     <div class="brand"><div class="brand-mark" aria-hidden="true">MG</div><div><div class="eyebrow">MG SMART FINANCE</div><h1>맞춤형 대출 상환 계산기</h1></div></div>
-    <div class="header-note">상환 방식별 부담을<br>한눈에 비교해 보세요</div>
+    <div class="header-actions"><div class="header-note">상환 방식별 부담을<br>한눈에 비교해 보세요</div><a class="page-link" href="https://kfcc009-a11y.github.io/mg0910/INDEX" aria-label="FAQ 화면으로 이동">HOME</a></div>
   </div></header>
   <main>
     <div class="workspace">
