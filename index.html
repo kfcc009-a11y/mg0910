@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#005bac">
+  <title>MG 맞춤형 대출 상환 계산기</title>
+  <style>
+    :root{--mg:#005bac;--mg-dark:#003f79;--mg-pale:#eaf4ff;--ink:#172535;--muted:#617184;--line:#dce5ee;--bg:#f4f7fa;--white:#fff;--green:#15965d;--shadow:0 12px 34px rgba(18,47,76,.09)}
+    *{box-sizing:border-box} html{font-size:16px} body{margin:0;background:var(--bg);color:var(--ink);font-family:Pretendard,"Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;line-height:1.5}
+    button,input,select{font:inherit} button{cursor:pointer} .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .topbar{height:5px;background:linear-gradient(90deg,var(--mg),#0087cf 64%,#19a36b)}
+    header{background:#fff;border-bottom:1px solid var(--line)} .header-inner{max-width:1440px;margin:auto;padding:18px 28px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .brand{display:flex;align-items:center;gap:13px}.brand-mark{width:42px;height:42px;border-radius:13px;background:var(--mg);color:#fff;display:grid;place-items:center;font-weight:900;letter-spacing:-1px;box-shadow:0 7px 15px rgba(0,91,172,.2)}
+    h1{font-size:1.28rem;margin:0;letter-spacing:-.04em}.eyebrow{font-size:.78rem;color:var(--mg);font-weight:800;letter-spacing:.08em;margin-bottom:2px}.header-note{font-size:.8rem;color:var(--muted);text-align:right}
+    main{max-width:1440px;margin:auto;padding:26px 28px 52px}.workspace{display:grid;grid-template-columns:minmax(310px,390px) minmax(0,1fr);gap:22px;align-items:start}
+    .panel{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}.inputs{padding:24px;position:sticky;top:18px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:21px}.section-head h2{font-size:1.08rem;margin:0;letter-spacing:-.035em}.section-head p{font-size:.78rem;color:var(--muted);margin:0}
+    .field{margin-bottom:22px}.field:last-child{margin-bottom:0}.label-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}.label-row label,.field>label{font-size:.9rem;font-weight:800}.hint{font-size:.75rem;color:var(--muted)}
+    .input-shell{height:52px;border:1px solid #cbd8e4;border-radius:12px;display:flex;align-items:center;background:#fff;overflow:hidden;transition:.2s}.input-shell:focus-within{border-color:var(--mg);box-shadow:0 0 0 3px rgba(0,91,172,.12)}.input-shell input{min-width:0;flex:1;border:0;outline:0;padding:0 14px;font-weight:750;color:var(--ink);text-align:right}.suffix{padding:0 14px;color:#485d70;font-size:.88rem;border-left:1px solid var(--line)}
+    .unit-select{border:0;border-left:1px solid var(--line);height:100%;padding:0 12px;color:var(--mg);font-weight:800;outline:0;background:#f8fbff}.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}.quick button{border:1px solid #c9dceb;background:#f5faff;color:var(--mg-dark);border-radius:9px;padding:8px 4px;font-size:.78rem;font-weight:750}.quick button:hover{border-color:var(--mg);background:var(--mg-pale)}
+    input[type=range]{width:100%;accent-color:var(--mg);margin:10px 0 0;height:6px}.range-ends{display:flex;justify-content:space-between;color:#8694a4;font-size:.7rem;margin-top:2px}
+    .method-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:#edf2f7;border-radius:12px;padding:5px}.method-tabs button{border:0;background:transparent;color:#667789;padding:10px 4px;border-radius:9px;font-size:.76rem;font-weight:800;line-height:1.25}.method-tabs button.active{background:#fff;color:var(--mg);box-shadow:0 2px 8px rgba(20,50,80,.1)}
+    .results{min-width:0}.summary-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:2px 2px 14px}.summary-head h2{font-size:1.12rem;margin:0}.assumption{font-size:.76rem;color:var(--muted)}
+    .compare-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.compare-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:19px;min-width:0;transition:.2s;position:relative;overflow:hidden}.compare-card.selected{border:2px solid var(--mg);padding:18px;box-shadow:0 12px 30px rgba(0,91,172,.12)}.compare-card.selected:before{content:"상세 보기";position:absolute;right:0;top:0;background:var(--mg);color:white;padding:5px 10px;border-radius:0 0 0 10px;font-size:.68rem;font-weight:800}.card-title{font-size:.86rem;color:#42556a;font-weight:800;margin-bottom:12px}.major-label{font-size:.73rem;color:var(--muted)}.major{font-size:1.5rem;font-weight:900;color:var(--mg-dark);letter-spacing:-.045em;margin:2px 0 14px;white-space:nowrap}.metrics{display:grid;gap:7px;border-top:1px solid #e8eef3;padding-top:12px}.metric{display:flex;justify-content:space-between;gap:8px;font-size:.78rem}.metric span{color:var(--muted)}.metric strong{white-space:nowrap}.compare-card button{position:absolute;inset:0;border:0;background:transparent;width:100%;height:100%;z-index:2}.compare-card button:focus-visible{outline:3px solid #55aaf3;outline-offset:-4px;border-radius:16px}
+    .schedule{margin-top:20px;overflow:hidden}.schedule-top{padding:22px 24px 16px;display:flex;justify-content:space-between;align-items:center;gap:16px}.schedule-title h2{font-size:1.06rem;margin:0 0 3px}.schedule-title p{font-size:.78rem;color:var(--muted);margin:0}.pill{display:inline-flex;align-items:center;background:var(--mg-pale);color:var(--mg-dark);border-radius:99px;padding:7px 11px;font-size:.75rem;font-weight:800}
+    .table-wrap{overflow:auto;border-top:1px solid var(--line);max-height:525px}table{width:100%;border-collapse:collapse;min-width:680px;font-variant-numeric:tabular-nums}th{position:sticky;top:0;z-index:1;background:#f4f8fc;color:#526477;font-size:.75rem;text-align:right;padding:12px 18px;border-bottom:1px solid var(--line)}th:first-child,td:first-child{text-align:center}td{text-align:right;padding:12px 18px;border-bottom:1px solid #edf1f5;font-size:.83rem}tbody tr:hover{background:#f8fbfe}td.payment{font-weight:850;color:var(--mg-dark)}tfoot td{position:sticky;bottom:0;background:#f0f6fc;font-weight:850;border-top:1px solid #cadbe9;border-bottom:0}
+    .notice{display:flex;gap:9px;margin-top:14px;padding:0 4px;color:#6e7d8c;font-size:.73rem}.notice svg{flex:0 0 auto;margin-top:2px}.mobile-summary{display:none}.no-js{padding:20px;text-align:center;color:#a22}
+    @media(max-width:1000px){.workspace{grid-template-columns:1fr}.inputs{position:static}.compare-grid{grid-template-columns:1fr 1fr 1fr}}
+    @media(max-width:720px){.header-inner{padding:14px 16px}.header-note{display:none}main{padding:16px 14px 36px}.panel{border-radius:16px}.inputs{padding:20px}.compare-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:7px}.compare-card{min-width:82%;scroll-snap-align:start}.summary-head{align-items:flex-start;flex-direction:column;gap:3px}.schedule-top{padding:18px;align-items:flex-start;flex-direction:column}.table-wrap{max-height:470px}th,td{padding:11px 13px}.notice{padding:0 2px}.brand-mark{width:38px;height:38px;border-radius:11px}h1{font-size:1.08rem}}
+    @media(max-width:390px){.quick{grid-template-columns:1fr}.method-tabs button{font-size:.7rem}.inputs{padding:17px}.major{font-size:1.35rem}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <div class="topbar"></div>
+  <header><div class="header-inner">
+    <div class="brand"><div class="brand-mark" aria-hidden="true">MG</div><div><div class="eyebrow">MG SMART FINANCE</div><h1>맞춤형 대출 상환 계산기</h1></div></div>
+    <div class="header-note">상환 방식별 부담을<br>한눈에 비교해 보세요</div>
+  </div></header>
+  <main>
+    <div class="workspace">
+      <section class="panel inputs" aria-labelledby="input-title">
+        <div class="section-head"><h2 id="input-title">대출 조건</h2><p>입력 즉시 자동 계산</p></div>
+        <div class="field">
+          <div class="label-row"><label for="amount">대출 금액</label><span class="hint" id="amountWon">100,000,000원</span></div>
+          <div class="input-shell"><input id="amount" type="number" value="10000" min="100" max="100000" step="100" inputmode="numeric" aria-describedby="amountWon"><span class="suffix">만원</span></div>
+          <input id="amountRange" type="range" min="100" max="100000" step="100" value="10000" aria-label="대출 금액 슬라이더">
+          <div class="range-ends"><span>100만원</span><span>10억원</span></div>
+          <div class="quick" aria-label="대출 금액 빠른 추가"><button type="button" data-add="100">+100만원</button><button type="button" data-add="500">+500만원</button><button type="button" data-add="1000">+1,000만원</button></div>
+        </div>
+        <div class="field">
+          <div class="label-row"><label for="term">대출 기간</label><span class="hint" id="termHint">60개월</span></div>
+          <div class="input-shell"><input id="term" type="number" value="5" min="1" max="40" step="1" inputmode="numeric"><select id="termUnit" class="unit-select" aria-label="대출 기간 단위"><option value="year" selected>년</option><option value="month">개월</option></select></div>
+          <input id="termRange" type="range" min="1" max="40" step="1" value="5" aria-label="대출 기간 슬라이더">
+          <div class="range-ends"><span id="termMin">1년</span><span id="termMax">40년</span></div>
+        </div>
+        <div class="field">
+          <div class="label-row"><label for="rate">연 이자율</label><span class="hint">고정금리 가정</span></div>
+          <div class="input-shell"><input id="rate" type="number" value="4.50" min="0" max="20" step="0.01" inputmode="decimal"><span class="suffix">%</span></div>
+          <input id="rateRange" type="range" min="0" max="20" step="0.01" value="4.5" aria-label="연 이자율 슬라이더">
+          <div class="range-ends"><span>0%</span><span>20%</span></div>
+        </div>
+        <div class="field">
+          <div class="label-row"><label id="method-label">상환 방식</label><span class="hint">카드를 눌러 상세 비교</span></div>
+          <div class="method-tabs" role="radiogroup" aria-labelledby="method-label">
+            <button type="button" role="radio" aria-checked="true" class="active" data-method="equalPayment">원리금균등</button>
+            <button type="button" role="radio" aria-checked="false" data-method="equalPrincipal">원금균등</button>
+            <button type="button" role="radio" aria-checked="false" data-method="bullet">만기일시</button>
+          </div>
+        </div>
+      </section>
+      <section class="results" aria-live="polite">
+        <div class="summary-head"><h2>상환 방식별 비교</h2><div class="assumption">매월 상환 · 원 단위 반올림</div></div>
+        <div class="compare-grid" id="compareGrid"></div>
+        <section class="panel schedule" aria-labelledby="schedule-title">
+          <div class="schedule-top"><div class="schedule-title"><h2 id="schedule-title">월별 상환 스케줄</h2><p id="scheduleDesc"></p></div><span class="pill" id="selectedPill"></span></div>
+          <div class="table-wrap"><table>
+            <caption class="sr-only">선택한 상환 방식의 회차별 원금, 이자, 월 납입금 및 잔액</caption>
+            <thead><tr><th scope="col">회차</th><th scope="col">상환 원금</th><th scope="col">이자</th><th scope="col">월 납입금</th><th scope="col">대출 잔액</th></tr></thead>
+            <tbody id="scheduleBody"></tbody><tfoot id="scheduleFoot"></tfoot>
+          </table></div>
+        </section>
+        <div class="notice"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="#6e7d8c" stroke-width="1.8"/><path d="M12 10v6m0-9h.01" stroke="#6e7d8c" stroke-width="1.8" stroke-linecap="round"/></svg><span>본 결과는 원리금 상환을 단순 시뮬레이션한 참고 자료입니다. 실제 대출금리, 일수 계산, 상환일, 중도상환 및 금융기관의 원 단위 처리 방식에 따라 달라질 수 있습니다.</span></div>
+      </section>
+    </div>
+  </main>
+  <noscript><div class="no-js">계산기를 사용하려면 JavaScript를 활성화해 주세요.</div></noscript>
+  <script>
+    (() => {
+      'use strict';
+      const $ = id => document.getElementById(id);
+      const els = {amount:$('amount'),amountRange:$('amountRange'),amountWon:$('amountWon'),term:$('term'),termUnit:$('termUnit'),termRange:$('termRange'),termHint:$('termHint'),termMin:$('termMin'),termMax:$('termMax'),rate:$('rate'),rateRange:$('rateRange'),compareGrid:$('compareGrid'),body:$('scheduleBody'),foot:$('scheduleFoot'),pill:$('selectedPill'),desc:$('scheduleDesc')};
+      const names = {equalPayment:'원리금균등분할상환',equalPrincipal:'원금균등분할상환',bullet:'만기일시상환'};
+      let selected = 'equalPayment';
+      const won = n => `${Math.round(Math.max(0,n)).toLocaleString('ko-KR')}원`;
+      const clamp = (v,min,max,fallback) => Math.min(max,Math.max(min,Number.isFinite(+v)?+v:fallback));
+      function months(){return els.termUnit.value==='year'?Math.round(+els.term.value*12):Math.round(+els.term.value)}
+      function buildSchedule(method, principal, annualRate, count){
+        const r=annualRate/100/12, rows=[]; let balance=principal, totalInterest=0, totalPayment=0;
+        const payment = r===0 ? principal/count : principal*r*Math.pow(1+r,count)/(Math.pow(1+r,count)-1);
+        const basePrincipal=principal/count;
+        for(let i=1;i<=count;i++){
+          const interest=balance*r; let principalPart, installment;
+          if(method==='equalPayment'){installment=payment; principalPart=installment-interest;if(i===count){principalPart=balance;installment=principalPart+interest}}
+          else if(method==='equalPrincipal'){principalPart=i===count?balance:basePrincipal;installment=principalPart+interest}
+          else{principalPart=i===count?balance:0;installment=principalPart+interest}
+          balance=Math.max(0,balance-principalPart); totalInterest+=interest; totalPayment+=installment;
+          rows.push({no:i,principal:principalPart,interest,payment:installment,balance});
+        }
+        return {rows,totalInterest,totalPayment,first:rows[0].payment,last:rows[rows.length-1].payment};
+      }
+      function values(){
+        const amountMan=clamp(els.amount.value,100,100000,10000); const count=clamp(months(),1,480,60); const rate=clamp(els.rate.value,0,20,4.5);
+        return {principal:amountMan*10000,count,rate};
+      }
+      function render(){
+        const {principal,count,rate}=values(); const all={}; Object.keys(names).forEach(k=>all[k]=buildSchedule(k,principal,rate,count));
+        els.amountWon.textContent=won(principal); els.termHint.textContent=`${count.toLocaleString()}개월`;
+        els.compareGrid.innerHTML=Object.keys(names).map(k=>{
+          const d=all[k], range=k==='equalPrincipal'&&Math.round(d.first)!==Math.round(d.last)?`${won(d.first)} → ${won(d.last)}`:won(d.first);
+          return `<article class="compare-card ${k===selected?'selected':''}"><div class="card-title">${names[k]}</div><div class="major-label">${k==='equalPrincipal'?'첫 회차 → 마지막 회차':'1회차 상환액'}</div><div class="major">${range}</div><div class="metrics"><div class="metric"><span>총 이자</span><strong>${won(d.totalInterest)}</strong></div><div class="metric"><span>총 납입액</span><strong>${won(d.totalPayment)}</strong></div></div><button type="button" data-card-method="${k}" aria-label="${names[k]} 상세 스케줄 보기"></button></article>`;
+        }).join('');
+        const d=all[selected]; els.pill.textContent=names[selected]; els.desc.textContent=`대출 ${won(principal)} · ${count}개월 · 연 ${rate.toFixed(2)}%`;
+        els.body.innerHTML=d.rows.map(row=>`<tr><td>${row.no}</td><td>${won(row.principal)}</td><td>${won(row.interest)}</td><td class="payment">${won(row.payment)}</td><td>${won(row.balance)}</td></tr>`).join('');
+        els.foot.innerHTML=`<tr><td>합계</td><td>${won(principal)}</td><td>${won(d.totalInterest)}</td><td>${won(d.totalPayment)}</td><td>—</td></tr>`;
+        document.querySelectorAll('[data-method]').forEach(b=>{const on=b.dataset.method===selected;b.classList.toggle('active',on);b.setAttribute('aria-checked',String(on))});
+      }
+      function syncPair(source,target){target.value=source.value;render()}
+      els.amount.addEventListener('input',()=>syncPair(els.amount,els.amountRange)); els.amountRange.addEventListener('input',()=>syncPair(els.amountRange,els.amount));
+      els.rate.addEventListener('input',()=>syncPair(els.rate,els.rateRange)); els.rateRange.addEventListener('input',()=>{els.rate.value=(+els.rateRange.value).toFixed(2);render()});
+      els.term.addEventListener('input',()=>syncPair(els.term,els.termRange)); els.termRange.addEventListener('input',()=>syncPair(els.termRange,els.term));
+      els.termUnit.addEventListener('change',()=>{const isYear=els.termUnit.value==='year';let current=+els.term.value;if(isYear)current=Math.max(1,Math.round(current/12));else current=Math.max(1,Math.round(current*12));const max=isYear?40:480;els.term.max=max;els.termRange.max=max;els.term.value=Math.min(max,current);els.termRange.value=els.term.value;els.termMin.textContent=isYear?'1년':'1개월';els.termMax.textContent=isYear?'40년':'480개월';render()});
+      document.querySelectorAll('[data-add]').forEach(b=>b.addEventListener('click',()=>{const v=clamp(+els.amount.value + +b.dataset.add,100,100000,10000);els.amount.value=v;els.amountRange.value=v;render()}));
+      document.querySelector('.method-tabs').addEventListener('click',e=>{const b=e.target.closest('[data-method]');if(b){selected=b.dataset.method;render()}});
+      els.compareGrid.addEventListener('click',e=>{const b=e.target.closest('[data-card-method]');if(b){selected=b.dataset.cardMethod;render();if(matchMedia('(max-width:720px)').matches)$('schedule-title').scrollIntoView({behavior:'smooth',block:'start'})}});
+      ['amount','term','rate'].forEach(id=>$(id).addEventListener('blur',()=>{const cfg={amount:[100,100000,10000],term:[1,els.termUnit.value==='year'?40:480,5],rate:[0,20,4.5]}[id];$(id).value=clamp($(id).value,...cfg);if(id==='rate')$(id).value=(+$(id).value).toFixed(2);const range=$(id+'Range');if(range)range.value=$(id).value;render()}));
+      render();
+    })();
+  </script>
+</body>
+</html>
