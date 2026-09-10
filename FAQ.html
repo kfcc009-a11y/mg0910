@@ -10,6 +10,10 @@
     body { margin:0; min-height:100vh; font-family:system-ui,-apple-system,"Segoe UI","Noto Sans KR",sans-serif; color:var(--ink); background:var(--bg); }
     .hero { padding:56px 24px 86px; color:#fff; background:linear-gradient(135deg,var(--green-dark),var(--green)); }
     .hero-inner,.container { width:min(920px,100%); margin:auto; }
+    .hero-inner { position:relative; }
+    .page-link { position:absolute; top:0; right:0; display:inline-flex; align-items:center; justify-content:center; min-width:76px; padding:10px 16px; border:1px solid rgba(255,255,255,.65); border-radius:10px; color:#fff; background:rgba(255,255,255,.12); text-decoration:none; font-size:14px; font-weight:800; backdrop-filter:blur(4px); }
+    .page-link:hover { background:#fff; color:var(--green-dark); }
+    .page-link:focus-visible { outline:3px solid #ffe58a; outline-offset:3px; }
     .eyebrow { margin:0 0 10px; font-size:14px; font-weight:700; letter-spacing:.08em; opacity:.78; }
     h1 { margin:0; font-size:clamp(30px,5vw,44px); letter-spacing:-.04em; }
     .subtitle { margin:12px 0 0; opacity:.82; }
@@ -39,12 +43,13 @@
     mark { padding:1px 2px; border-radius:3px; color:inherit; background:#ffe58a; }
     .empty { padding:54px 20px; border:1px dashed #bccac5; border-radius:15px; color:var(--muted); background:#fff; text-align:center; }
     .empty strong { display:block; margin-bottom:7px; color:var(--ink); font-size:17px; }
-    @media (max-width:600px) { .hero{padding-top:40px}.search-row{flex-direction:column}.view-all{height:44px}.container{padding-inline:14px}.search-panel{padding:16px}.card{padding:18px} }
+    @media (max-width:600px) { .hero{padding-top:34px}.hero-inner{padding-top:48px}.page-link{left:0;right:auto}.search-row{flex-direction:column}.view-all{height:44px}.container{padding-inline:14px}.search-panel{padding:16px}.card{padding:18px} }
   </style>
 </head>
 <body>
   <header class="hero">
     <div class="hero-inner">
+      <a class="page-link" href="https://kfcc009-a11y.github.io/mg0910/" aria-label="대출 상환 계산기 화면으로 이동">FAQ</a>
       <p class="eyebrow">WORK FAQ</p>
       <h1>업무 FAQ 검색</h1>
       <p class="subtitle">자주 묻는 업무 질문을 빠르게 찾아보세요.</p>
