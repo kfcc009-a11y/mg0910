@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="주요 금융기관 정기예금 금리 비교 대시보드" />
+  <title>정기예금 금리 리서치</title>
+  <style>
+    :root {
+      --green-950: #073b2b;
+      --green-800: #0b6247;
+      --green-600: #0f8a5f;
+      --green-100: #dff5eb;
+      --mint: #effaf5;
+      --ink: #13231d;
+      --muted: #65736d;
+      --line: #dce7e1;
+      --surface: #ffffff;
+      --bg: #f4f8f6;
+      --orange: #ed8b35;
+      --shadow: 0 18px 45px rgba(7, 59, 43, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 93% 7%, rgba(15, 138, 95, 0.13), transparent 24rem),
+        var(--bg);
+      font-family: Pretendard, "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+    }
+
+    button { font: inherit; }
+
+    .shell {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 38px 0 56px;
+    }
+
+    header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--green-600);
+      font-size: 0.86rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--green-950);
+      font-size: clamp(1.9rem, 4vw, 3rem);
+      line-height: 1.1;
+      letter-spacing: -0.045em;
+    }
+
+    .subtext {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .refresh {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 0 18px;
+      border: 1px solid var(--green-800);
+      border-radius: 999px;
+      color: var(--green-800);
+      background: rgba(255,255,255,0.82);
+      font-weight: 750;
+      cursor: pointer;
+      transition: 160ms ease;
+    }
+
+    .refresh:hover { color: white; background: var(--green-800); }
+    .refresh:focus-visible { outline: 3px solid rgba(15, 138, 95, 0.28); outline-offset: 3px; }
+    .refresh[disabled] { opacity: 0.55; cursor: wait; }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      position: relative;
+      overflow: hidden;
+      min-height: 150px;
+      padding: 24px;
+      border: 1px solid rgba(11, 98, 71, 0.12);
+      border-radius: 22px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      right: -26px;
+      bottom: -36px;
+      width: 112px;
+      height: 112px;
+      border-radius: 50%;
+      background: var(--green-100);
+    }
+
+    .card.featured {
+      color: white;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--green-950), var(--green-600));
+    }
+
+    .card.featured::after { background: rgba(255,255,255,0.09); }
+    .card-label { margin: 0 0 18px; color: var(--muted); font-size: 0.9rem; font-weight: 700; }
+    .featured .card-label { color: rgba(255,255,255,0.72); }
+    .card-value { position: relative; z-index: 1; margin: 0; font-size: 2rem; font-weight: 850; letter-spacing: -0.04em; }
+    .card-note { position: relative; z-index: 1; margin: 7px 0 0; color: var(--muted); font-size: 0.86rem; }
+    .featured .card-note { color: rgba(255,255,255,0.72); }
+
+    .panel {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 22px 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h2 { margin: 0; font-size: 1.12rem; letter-spacing: -0.02em; }
+    .status { color: var(--muted); font-size: 0.86rem; }
+    .status.error { color: #b42318; font-weight: 700; }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; min-width: 960px; border-collapse: collapse; }
+    th, td { padding: 17px 18px; text-align: left; vertical-align: middle; }
+    th { color: var(--muted); background: var(--mint); font-size: 0.81rem; font-weight: 800; white-space: nowrap; }
+    td { border-top: 1px solid #edf2ef; font-size: 0.92rem; }
+    tbody tr { transition: background 130ms ease; }
+    tbody tr:hover { background: #f8fcfa; }
+
+    .institution { font-weight: 800; color: var(--green-950); }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: var(--green-800);
+      background: var(--green-100);
+      font-size: 0.79rem;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .rate { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .rate.max { color: var(--orange); font-size: 1rem; font-weight: 850; }
+    .condition { max-width: 330px; color: #516059; line-height: 1.55; }
+
+    .empty { padding: 64px 24px; color: var(--muted); text-align: center; }
+    .skeleton { height: 16px; border-radius: 8px; background: linear-gradient(90deg, #edf2ef 25%, #f8faf9 50%, #edf2ef 75%); background-size: 200% 100%; animation: shimmer 1.3s infinite; }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    footer { margin-top: 18px; color: var(--muted); font-size: 0.8rem; text-align: right; }
+
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 24px, 1180px); padding-top: 26px; }
+      header { align-items: flex-start; flex-direction: column; }
+      .summary { grid-template-columns: 1fr; }
+      .card { min-height: 126px; }
+      .refresh { width: 100%; justify-content: center; }
+      .panel-head { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <p class="eyebrow">MARKET RESEARCH</p>
+        <h1>정기예금 금리 리서치</h1>
+        <p class="subtext">주요 금융기관의 1년 만기 정기예금 금리를 비교합니다.</p>
+      </div>
+      <button class="refresh" id="refreshButton" type="button" aria-label="최신 데이터 다시 불러오기">
+        <span aria-hidden="true">↻</span> 새로고침
+      </button>
+    </header>
+
+    <section class="summary" aria-label="금리 요약">
+      <article class="card">
+        <p class="card-label">조사 금융기관</p>
+        <p class="card-value" id="institutionCount">-</p>
+        <p class="card-note">현재 등록된 기관</p>
+      </article>
+      <article class="card featured">
+        <p class="card-label">가장 높은 최고금리</p>
+        <p class="card-value" id="highestRate">-</p>
+        <p class="card-note" id="highestInstitution">데이터를 불러오는 중</p>
+      </article>
+      <article class="card">
+        <p class="card-label">평균 최고금리</p>
+        <p class="card-value" id="averageRate">-</p>
+        <p class="card-note">전체 기관 단순평균</p>
+      </article>
+    </section>
+
+    <section class="panel" aria-labelledby="tableTitle">
+      <div class="panel-head">
+        <h2 id="tableTitle">금융기관별 상품 현황</h2>
+        <span class="status" id="status" role="status" aria-live="polite">불러오는 중...</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>금융기관명</th>
+              <th>권역 분류</th>
+              <th>대표 상품명</th>
+              <th>기본금리</th>
+              <th>최고우대금리</th>
+              <th>주요 우대 조건</th>
+            </tr>
+          </thead>
+          <tbody id="rateTableBody">
+            <tr><td colspan="6"><div class="skeleton"></div></td></tr>
+            <tr><td colspan="6"><div class="skeleton"></div></td></tr>
+            <tr><td colspan="6"><div class="skeleton"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <footer>금리는 세전 연이율 기준이며 실제 가입 전 최신 공시를 확인하세요.</footer>
+  </main>
+
+  <script>
+    const SUPABASE_URL = "https://pzmulsmfjbsvdkucgmaj.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_FMge1ZxLqGauF8S-ehXZoA_fOGus_nS";
+    const ENDPOINT = `${SUPABASE_URL}/rest/v1/deposit_rate_research?select=*&order=maximum_rate.desc,institution_name.asc`;
+
+    const tableBody = document.getElementById("rateTableBody");
+    const status = document.getElementById("status");
+    const refreshButton = document.getElementById("refreshButton");
+
+    const escapeHtml = (value) => String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+
+    const formatRate = (value) => `${Number(value).toFixed(2)}%`;
+
+    function renderSummary(rows) {
+      document.getElementById("institutionCount").textContent = `${rows.length}곳`;
+      if (!rows.length) {
+        document.getElementById("highestRate").textContent = "-";
+        document.getElementById("highestInstitution").textContent = "등록된 데이터 없음";
+        document.getElementById("averageRate").textContent = "-";
+        return;
+      }
+      const highest = rows.reduce((best, row) => Number(row.maximum_rate) > Number(best.maximum_rate) ? row : best);
+      const average = rows.reduce((sum, row) => sum + Number(row.maximum_rate), 0) / rows.length;
+      document.getElementById("highestRate").textContent = formatRate(highest.maximum_rate);
+      document.getElementById("highestInstitution").textContent = highest.institution_name;
+      document.getElementById("averageRate").textContent = formatRate(average);
+    }
+
+    function renderTable(rows) {
+      if (!rows.length) {
+        tableBody.innerHTML = '<tr><td colspan="6" class="empty">등록된 정기예금 데이터가 없습니다.</td></tr>';
+        return;
+      }
+      tableBody.innerHTML = rows.map((row) => `
+        <tr>
+          <td class="institution">${escapeHtml(row.institution_name)}</td>
+          <td><span class="badge">${escapeHtml(row.sector_category)}</span></td>
+          <td>${escapeHtml(row.product_name)}</td>
+          <td class="rate">${formatRate(row.base_rate)}</td>
+          <td class="rate max">${formatRate(row.maximum_rate)}</td>
+          <td class="condition">${escapeHtml(row.preferential_conditions || "-")}</td>
+        </tr>
+      `).join("");
+    }
+
+    async function loadRates() {
+      refreshButton.disabled = true;
+      status.className = "status";
+      status.textContent = "최신 데이터를 불러오는 중...";
+      try {
+        const response = await fetch(ENDPOINT, {
+          headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const rows = await response.json();
+        renderSummary(rows);
+        renderTable(rows);
+        status.textContent = `${rows.length}건 · ${new Date().toLocaleString("ko-KR")} 갱신`;
+      } catch (error) {
+        console.error(error);
+        status.className = "status error";
+        status.textContent = "데이터를 불러오지 못했습니다.";
+        tableBody.innerHTML = '<tr><td colspan="6" class="empty">잠시 후 새로고침을 눌러 다시 시도해 주세요.</td></tr>';
+      } finally {
+        refreshButton.disabled = false;
+      }
+    }
+
+    refreshButton.addEventListener("click", loadRates);
+    loadRates();
+  </script>
+</body>
+</html>
