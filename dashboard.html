@@ -3,488 +3,105 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="주요 금융기관 정기예금 금리 비교 대시보드" />
-  <title>정기예금 금리 리서치</title>
+  <meta name="description" content="새마을금고 업무 데이터 통합 관리 대시보드" />
+  <title>MG 통합 업무관리</title>
   <style>
     :root {
-      --green-950: #073b2b;
-      --green-800: #0b6247;
-      --green-600: #0f8a5f;
-      --green-100: #dff5eb;
-      --mint: #effaf5;
-      --ink: #13231d;
-      --muted: #65736d;
-      --line: #dce7e1;
-      --surface: #ffffff;
-      --bg: #f4f8f6;
-      --orange: #ed8b35;
-      --shadow: 0 18px 45px rgba(7, 59, 43, 0.08);
+      --navy:#102c3b; --navy-2:#173e50; --green:#078b65; --green-dark:#056b4e;
+      --green-soft:#e7f6f0; --orange:#ed8a35; --red:#c83b32; --red-soft:#fff0ee;
+      --ink:#182622; --muted:#66756f; --line:#dce6e1; --bg:#f3f7f5; --white:#fff;
+      --shadow:0 18px 50px rgba(16,44,59,.08);
     }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at 93% 7%, rgba(15, 138, 95, 0.13), transparent 24rem),
-        var(--bg);
-      font-family: Pretendard, "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
-    }
-
-    button, input { font: inherit; }
-
-    .shell {
-      width: min(1180px, calc(100% - 40px));
-      margin: 0 auto;
-      padding: 38px 0 56px;
-    }
-
-    header {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 24px;
-      margin-bottom: 28px;
-    }
-
-    .eyebrow {
-      margin: 0 0 8px;
-      color: var(--green-600);
-      font-size: 0.86rem;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-    }
-
-    h1 {
-      margin: 0;
-      color: var(--green-950);
-      font-size: clamp(1.9rem, 4vw, 3rem);
-      line-height: 1.1;
-      letter-spacing: -0.045em;
-    }
-
-    .subtext {
-      margin: 12px 0 0;
-      color: var(--muted);
-      font-size: 1rem;
-    }
-
-    .refresh {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      min-height: 44px;
-      padding: 0 18px;
-      border: 1px solid var(--green-800);
-      border-radius: 999px;
-      color: var(--green-800);
-      background: rgba(255,255,255,0.82);
-      font-weight: 750;
-      cursor: pointer;
-      transition: 160ms ease;
-    }
-
-    .refresh:hover { color: white; background: var(--green-800); }
-    .refresh:focus-visible { outline: 3px solid rgba(15, 138, 95, 0.28); outline-offset: 3px; }
-    .refresh[disabled] { opacity: 0.55; cursor: wait; }
-
-    .summary {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-      margin-bottom: 18px;
-    }
-
-    .config-panel {
-      margin-bottom: 18px;
-      padding: 22px 24px;
-      border: 1px solid rgba(11, 98, 71, 0.18);
-      border-radius: 22px;
-      background: rgba(255, 255, 255, 0.9);
-      box-shadow: var(--shadow);
-    }
-
-    .config-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 20px;
-      margin-bottom: 18px;
-    }
-
-    .config-head p { margin: 7px 0 0; color: var(--muted); font-size: 0.88rem; line-height: 1.55; }
-    .config-grid { display: grid; grid-template-columns: 1.15fr 1fr auto; gap: 12px; align-items: end; }
-    .field { display: grid; gap: 7px; }
-    .field label { color: var(--green-950); font-size: 0.84rem; font-weight: 800; }
-    .field input {
-      width: 100%;
-      min-height: 46px;
-      padding: 0 14px;
-      border: 1px solid #cbd9d2;
-      border-radius: 12px;
-      color: var(--ink);
-      background: white;
-      outline: none;
-      transition: 150ms ease;
-    }
-    .field input:focus { border-color: var(--green-600); box-shadow: 0 0 0 3px rgba(15, 138, 95, 0.13); }
-    .config-actions { display: flex; gap: 8px; }
-    .connect, .clear {
-      min-height: 46px;
-      padding: 0 17px;
-      border-radius: 12px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-    .connect { border: 1px solid var(--green-800); color: white; background: var(--green-800); }
-    .connect:hover { background: var(--green-950); }
-    .clear { border: 1px solid var(--line); color: var(--muted); background: white; }
-    .connect:focus-visible, .clear:focus-visible { outline: 3px solid rgba(15, 138, 95, 0.24); outline-offset: 2px; }
-    .config-message { min-height: 20px; margin: 12px 0 0; color: var(--muted); font-size: 0.84rem; }
-    .config-message.error { color: #b42318; font-weight: 700; }
-    .security-note { color: #8a4b13 !important; }
-
-    .card {
-      position: relative;
-      overflow: hidden;
-      min-height: 150px;
-      padding: 24px;
-      border: 1px solid rgba(11, 98, 71, 0.12);
-      border-radius: 22px;
-      background: var(--surface);
-      box-shadow: var(--shadow);
-    }
-
-    .card::after {
-      content: "";
-      position: absolute;
-      right: -26px;
-      bottom: -36px;
-      width: 112px;
-      height: 112px;
-      border-radius: 50%;
-      background: var(--green-100);
-    }
-
-    .card.featured {
-      color: white;
-      border-color: transparent;
-      background: linear-gradient(135deg, var(--green-950), var(--green-600));
-    }
-
-    .card.featured::after { background: rgba(255,255,255,0.09); }
-    .card-label { margin: 0 0 18px; color: var(--muted); font-size: 0.9rem; font-weight: 700; }
-    .featured .card-label { color: rgba(255,255,255,0.72); }
-    .card-value { position: relative; z-index: 1; margin: 0; font-size: 2rem; font-weight: 850; letter-spacing: -0.04em; }
-    .card-note { position: relative; z-index: 1; margin: 7px 0 0; color: var(--muted); font-size: 0.86rem; }
-    .featured .card-note { color: rgba(255,255,255,0.72); }
-
-    .panel {
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      background: var(--surface);
-      box-shadow: var(--shadow);
-    }
-
-    .panel-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 22px 24px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    h2 { margin: 0; font-size: 1.12rem; letter-spacing: -0.02em; }
-    .status { color: var(--muted); font-size: 0.86rem; }
-    .status.error { color: #b42318; font-weight: 700; }
-
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; min-width: 960px; border-collapse: collapse; }
-    th, td { padding: 17px 18px; text-align: left; vertical-align: middle; }
-    th { color: var(--muted); background: var(--mint); font-size: 0.81rem; font-weight: 800; white-space: nowrap; }
-    td { border-top: 1px solid #edf2ef; font-size: 0.92rem; }
-    tbody tr { transition: background 130ms ease; }
-    tbody tr:hover { background: #f8fcfa; }
-
-    .institution { font-weight: 800; color: var(--green-950); }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 6px 10px;
-      border-radius: 999px;
-      color: var(--green-800);
-      background: var(--green-100);
-      font-size: 0.79rem;
-      font-weight: 750;
-      white-space: nowrap;
-    }
-
-    .rate { font-variant-numeric: tabular-nums; white-space: nowrap; }
-    .rate.max { color: var(--orange); font-size: 1rem; font-weight: 850; }
-    .condition { max-width: 330px; color: #516059; line-height: 1.55; }
-
-    .empty { padding: 64px 24px; color: var(--muted); text-align: center; }
-    .skeleton { height: 16px; border-radius: 8px; background: linear-gradient(90deg, #edf2ef 25%, #f8faf9 50%, #edf2ef 75%); background-size: 200% 100%; animation: shimmer 1.3s infinite; }
-    @keyframes shimmer { to { background-position: -200% 0; } }
-
-    footer { margin-top: 18px; color: var(--muted); font-size: 0.8rem; text-align: right; }
-
-    @media (max-width: 760px) {
-      .shell { width: min(100% - 24px, 1180px); padding-top: 26px; }
-      header { align-items: flex-start; flex-direction: column; }
-      .summary { grid-template-columns: 1fr; }
-      .config-head { flex-direction: column; }
-      .config-grid { grid-template-columns: 1fr; }
-      .config-actions { width: 100%; }
-      .config-actions button { flex: 1; }
-      .card { min-height: 126px; }
-      .refresh { width: 100%; justify-content: center; }
-      .panel-head { align-items: flex-start; flex-direction: column; }
-    }
+    *{box-sizing:border-box} body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:Pretendard,"Noto Sans KR","Malgun Gothic",system-ui,sans-serif}
+    button,input,select,textarea{font:inherit} button{cursor:pointer}
+    .app{min-height:100vh;display:grid;grid-template-columns:250px 1fr}
+    aside{position:sticky;top:0;height:100vh;padding:28px 18px;background:linear-gradient(180deg,var(--navy),#0b2430);color:#fff}
+    .brand{padding:0 12px 25px;border-bottom:1px solid rgba(255,255,255,.12)}
+    .brand-mark{display:inline-grid;place-items:center;width:42px;height:42px;margin-bottom:14px;border-radius:14px;background:var(--green);font-weight:900}
+    .brand h1{margin:0;font-size:1.28rem}.brand p{margin:6px 0 0;color:rgba(255,255,255,.6);font-size:.78rem}
+    nav{display:grid;gap:5px;margin-top:22px}.nav-button{width:100%;padding:12px 13px;border:0;border-radius:12px;background:transparent;color:rgba(255,255,255,.72);text-align:left;font-weight:700;transition:.15s}
+    .nav-button:hover,.nav-button.active{background:rgba(255,255,255,.11);color:#fff}.nav-button.active{box-shadow:inset 3px 0 var(--green)}
+    .side-foot{position:absolute;right:18px;bottom:22px;left:18px;padding:13px;border:1px solid rgba(255,255,255,.12);border-radius:13px;color:rgba(255,255,255,.68);font-size:.76rem;line-height:1.5}
+    main{min-width:0;padding:34px clamp(18px,4vw,50px) 60px}
+    .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:24px}
+    .eyebrow{margin:0 0 7px;color:var(--green);font-size:.78rem;font-weight:900;letter-spacing:.12em}.page-title{margin:0;color:var(--navy);font-size:clamp(1.8rem,4vw,2.65rem);letter-spacing:-.05em}.page-desc{margin:9px 0 0;color:var(--muted)}
+    .status-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:.82rem;font-weight:800}.status-dot{width:8px;height:8px;border-radius:50%;background:#a7b2ad}.status-pill.connected .status-dot{background:#1bab78;box-shadow:0 0 0 4px rgba(27,171,120,.12)}
+    .setup{margin-bottom:20px;padding:20px;border:1px solid var(--line);border-radius:20px;background:#fff;box-shadow:var(--shadow)}
+    .setup-head{display:flex;justify-content:space-between;gap:18px;margin-bottom:15px}.setup h2{margin:0;font-size:1rem}.setup p{margin:5px 0 0;color:var(--muted);font-size:.82rem}.warning{color:#9a551d!important;font-weight:700}
+    .setup-grid{display:grid;grid-template-columns:1.2fr 1fr auto;gap:10px;align-items:end}.field{display:grid;gap:6px}.field label{font-size:.8rem;font-weight:850;color:var(--navy)}
+    input,select,textarea{width:100%;border:1px solid #cbd8d2;border-radius:11px;background:#fff;color:var(--ink);outline:none}input,select{min-height:44px;padding:0 12px}textarea{min-height:92px;padding:11px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(7,139,101,.11)}input:disabled{background:#f0f3f2;color:#77827e}
+    .button-row{display:flex;gap:8px}.btn{min-height:44px;padding:0 15px;border:1px solid transparent;border-radius:11px;font-weight:850}.btn-primary{background:var(--green);color:#fff}.btn-primary:hover{background:var(--green-dark)}.btn-secondary{border-color:var(--line);background:#fff;color:var(--muted)}.btn-danger{background:var(--red);color:#fff}.btn-small{min-height:34px;padding:0 10px;border-radius:9px;font-size:.78rem}.btn:disabled{opacity:.5;cursor:not-allowed}
+    .message{min-height:18px;margin:10px 0 0;color:var(--muted);font-size:.8rem}.message.error{color:var(--red);font-weight:750}.security-banner{display:none;margin-bottom:18px;padding:13px 16px;border:1px solid #f4c7c3;border-radius:13px;background:var(--red-soft);color:#8e2f28;font-size:.82rem;line-height:1.55}.security-banner.show{display:block}
+    .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:20px}.stat-card{min-height:120px;padding:19px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:var(--shadow)}.stat-label{margin:0;color:var(--muted);font-size:.8rem;font-weight:750}.stat-value{margin:15px 0 0;color:var(--navy);font-size:1.75rem;font-weight:900}.stat-note{margin:5px 0 0;color:var(--muted);font-size:.75rem}
+    .modules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.module-card{padding:18px;border:1px solid var(--line);border-radius:17px;background:#fff;text-align:left;transition:.16s}.module-card:hover{transform:translateY(-2px);border-color:#9fcdbb;box-shadow:var(--shadow)}.module-card strong{display:block;color:var(--navy);font-size:1rem}.module-card span{display:block;margin-top:6px;color:var(--muted);font-size:.79rem}.module-count{margin-top:17px!important;color:var(--green)!important;font-size:1.35rem!important;font-weight:900}
+    .panel{overflow:hidden;border:1px solid var(--line);border-radius:20px;background:#fff;box-shadow:var(--shadow)}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:19px 20px;border-bottom:1px solid var(--line)}.panel-title{margin:0;font-size:1.08rem}.panel-actions{display:flex;gap:8px}.table-wrap{overflow:auto}table{width:100%;min-width:920px;border-collapse:collapse}th,td{padding:14px 15px;text-align:left;vertical-align:middle}th{position:sticky;top:0;background:#eef7f3;color:#53655d;font-size:.76rem;white-space:nowrap}td{border-top:1px solid #edf2ef;font-size:.83rem}tbody tr:hover{background:#f8fcfa}.number{text-align:right;font-variant-numeric:tabular-nums}.row-actions{display:flex;gap:6px;white-space:nowrap}.empty{padding:55px!important;color:var(--muted);text-align:center}.badge{display:inline-flex;padding:5px 8px;border-radius:999px;background:var(--green-soft);color:var(--green-dark);font-size:.72rem;font-weight:800}
+    dialog{width:min(650px,calc(100% - 28px));max-height:88vh;padding:0;border:0;border-radius:20px;box-shadow:0 30px 90px rgba(0,0,0,.22)}dialog::backdrop{background:rgba(9,31,39,.55);backdrop-filter:blur(3px)}.modal-head{display:flex;align-items:center;justify-content:space-between;padding:20px 22px;border-bottom:1px solid var(--line)}.modal-head h2{margin:0;font-size:1.1rem}.icon-btn{width:36px;height:36px;border:0;border-radius:10px;background:#eef3f1;color:var(--muted);font-size:1.2rem}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:22px;max-height:60vh;overflow:auto}.form-grid .wide{grid-column:1/-1}.modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 22px;border-top:1px solid var(--line)}.toast{position:fixed;right:24px;bottom:24px;z-index:20;max-width:380px;padding:14px 17px;border-radius:13px;background:var(--navy);color:#fff;box-shadow:var(--shadow);opacity:0;transform:translateY(12px);pointer-events:none;transition:.2s}.toast.show{opacity:1;transform:none}.toast.error{background:var(--red)}
+    .hidden{display:none!important}
+    @media(max-width:980px){.app{grid-template-columns:1fr}aside{position:relative;height:auto;padding:18px}.brand{padding:0 0 15px}.brand-mark,.side-foot{display:none}nav{display:flex;margin-top:14px;overflow:auto}.nav-button{width:auto;white-space:nowrap}.setup-grid{grid-template-columns:1fr}.cards,.modules{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:620px){main{padding:24px 12px 45px}.topbar,.setup-head,.panel-head{align-items:flex-start;flex-direction:column}.cards,.modules{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.form-grid .wide{grid-column:auto}.panel-actions,.button-row{width:100%}.panel-actions .btn,.button-row .btn{flex:1}}
   </style>
 </head>
 <body>
-  <main class="shell">
-    <header>
-      <div>
-        <p class="eyebrow">MARKET RESEARCH</p>
-        <h1>정기예금 금리 리서치</h1>
-        <p class="subtext">주요 금융기관의 1년 만기 정기예금 금리를 비교합니다.</p>
-      </div>
-      <button class="refresh" id="refreshButton" type="button" aria-label="최신 데이터 다시 불러오기">
-        <span aria-hidden="true">↻</span> 새로고침
-      </button>
-    </header>
-
-    <section class="config-panel" aria-labelledby="configTitle">
-      <div class="config-head">
-        <div>
-          <h2 id="configTitle">Supabase 연결 설정</h2>
-          <p>프로젝트 URL과 공개용 publishable 또는 anon 키를 입력하세요. 입력값은 현재 브라우저 탭에만 저장됩니다.</p>
-        </div>
-        <p class="security-note">service_role 및 secret 키는 입력하지 마세요.</p>
-      </div>
-      <form id="configForm" class="config-grid">
-        <div class="field">
-          <label for="supabaseUrl">SUPABASE_URL</label>
-          <input id="supabaseUrl" name="supabaseUrl" type="url" placeholder="https://your-project.supabase.co" autocomplete="url" required />
-        </div>
-        <div class="field">
-          <label for="supabaseKey">SUPABASE_KEY</label>
-          <input id="supabaseKey" name="supabaseKey" type="password" placeholder="sb_publishable_... 또는 anon 키" autocomplete="off" required />
-        </div>
-        <div class="config-actions">
-          <button class="connect" type="submit">연결하기</button>
-          <button class="clear" id="clearConfig" type="button">초기화</button>
-        </div>
-      </form>
-      <p class="config-message" id="configMessage" role="status" aria-live="polite"></p>
+<div class="app">
+  <aside>
+    <div class="brand"><div class="brand-mark">MG</div><h1>통합 업무관리</h1><p>SUPABASE DATA CONSOLE</p></div>
+    <nav id="nav"></nav>
+    <div class="side-foot">공개용 publishable/anon 키만 사용하세요.<br>secret 또는 service_role 키는 입력할 수 없습니다.</div>
+  </aside>
+  <main>
+    <div class="topbar"><div><p class="eyebrow">OPERATIONS DASHBOARD</p><h1 class="page-title" id="pageTitle">통합 현황</h1><p class="page-desc" id="pageDesc">지점·조합원·예적금·대출·거래 데이터를 한곳에서 관리합니다.</p></div><div class="status-pill" id="connectionStatus"><span class="status-dot"></span><span>연결되지 않음</span></div></div>
+    <section class="setup" aria-labelledby="setupTitle"><div class="setup-head"><div><h2 id="setupTitle">Supabase 연결 설정</h2><p>입력값은 현재 브라우저 탭에만 저장됩니다.</p></div><p class="warning">RLS와 사용자 인증을 설정한 운영 환경에서 사용하세요.</p></div>
+      <form id="setupForm" class="setup-grid"><div class="field"><label for="urlInput">SUPABASE_URL</label><input id="urlInput" type="url" placeholder="https://your-project.supabase.co" required></div><div class="field"><label for="keyInput">SUPABASE_KEY</label><input id="keyInput" type="password" placeholder="sb_publishable_... 또는 anon 키" required autocomplete="off"></div><div class="button-row"><button class="btn btn-primary" type="submit">연결</button><button class="btn btn-secondary" id="resetButton" type="button">초기화</button></div></form><p class="message" id="setupMessage" role="status"></p>
     </section>
-
-    <section class="summary" aria-label="금리 요약">
-      <article class="card">
-        <p class="card-label">조사 금융기관</p>
-        <p class="card-value" id="institutionCount">-</p>
-        <p class="card-note">현재 등록된 기관</p>
-      </article>
-      <article class="card featured">
-        <p class="card-label">가장 높은 최고금리</p>
-        <p class="card-value" id="highestRate">-</p>
-        <p class="card-note" id="highestInstitution">데이터를 불러오는 중</p>
-      </article>
-      <article class="card">
-        <p class="card-label">평균 최고금리</p>
-        <p class="card-value" id="averageRate">-</p>
-        <p class="card-note">전체 기관 단순평균</p>
-      </article>
-    </section>
-
-    <section class="panel" aria-labelledby="tableTitle">
-      <div class="panel-head">
-        <h2 id="tableTitle">금융기관별 상품 현황</h2>
-        <span class="status" id="status" role="status" aria-live="polite">불러오는 중...</span>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>금융기관명</th>
-              <th>권역 분류</th>
-              <th>대표 상품명</th>
-              <th>기본금리</th>
-              <th>최고우대금리</th>
-              <th>주요 우대 조건</th>
-            </tr>
-          </thead>
-          <tbody id="rateTableBody">
-            <tr><td colspan="6"><div class="skeleton"></div></td></tr>
-            <tr><td colspan="6"><div class="skeleton"></div></td></tr>
-            <tr><td colspan="6"><div class="skeleton"></div></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-    <footer>금리는 세전 연이율 기준이며 실제 가입 전 최신 공시를 확인하세요.</footer>
+    <div class="security-banner" id="securityBanner"><strong>보안 안내:</strong> 현재 프로젝트에서 일부 테이블의 RLS가 비활성화되어 있으면 공개키만으로 데이터가 변경될 수 있습니다. 실제 운영 전 반드시 로그인 사용자별 RLS 정책을 구성하세요.</div>
+    <section id="homeView"><div class="cards"><article class="stat-card"><p class="stat-label">관리 테이블</p><p class="stat-value">6개</p><p class="stat-note">public 사용자 정의 테이블</p></article><article class="stat-card"><p class="stat-label">전체 레코드</p><p class="stat-value" id="totalRows">-</p><p class="stat-note">테이블별 조회 합계</p></article><article class="stat-card"><p class="stat-label">마지막 갱신</p><p class="stat-value" id="lastUpdated">-</p><p class="stat-note">현재 브라우저 기준</p></article></div><div class="modules" id="moduleCards"></div></section>
+    <section class="panel hidden" id="tableView"><div class="panel-head"><div><h2 class="panel-title" id="tableTitle">데이터 목록</h2><p class="message" id="tableMessage"></p></div><div class="panel-actions"><button class="btn btn-secondary" id="reloadButton">새로고침</button><button class="btn btn-primary" id="addButton">신규 등록</button></div></div><div class="table-wrap"><table><thead id="tableHead"></thead><tbody id="tableBody"></tbody></table></div></section>
   </main>
+</div>
 
-  <script>
-    const tableBody = document.getElementById("rateTableBody");
-    const status = document.getElementById("status");
-    const refreshButton = document.getElementById("refreshButton");
-    const configForm = document.getElementById("configForm");
-    const supabaseUrlInput = document.getElementById("supabaseUrl");
-    const supabaseKeyInput = document.getElementById("supabaseKey");
-    const configMessage = document.getElementById("configMessage");
-    const clearConfigButton = document.getElementById("clearConfig");
+<dialog id="recordDialog"><form id="recordForm" method="dialog"><div class="modal-head"><h2 id="dialogTitle">신규 등록</h2><button class="icon-btn" id="closeDialog" type="button" aria-label="닫기">×</button></div><div class="form-grid" id="formFields"></div><div class="modal-foot"><button class="btn btn-secondary" id="cancelDialog" type="button">취소</button><button class="btn btn-primary" id="saveButton" type="submit">저장</button></div></form></dialog>
+<dialog id="deleteDialog"><div class="modal-head"><h2>데이터 삭제</h2><button class="icon-btn" id="closeDelete" type="button">×</button></div><div style="padding:22px;line-height:1.65"><strong id="deleteRecordLabel"></strong><p style="color:var(--muted)">이 작업은 되돌릴 수 없습니다. 연결된 데이터가 있으면 외래키 제약으로 삭제가 거부될 수 있습니다.</p></div><div class="modal-foot"><button class="btn btn-secondary" id="cancelDelete">취소</button><button class="btn btn-danger" id="confirmDelete">삭제</button></div></dialog>
+<div class="toast" id="toast" role="status"></div>
 
-    let supabaseUrl = sessionStorage.getItem("depositDashboard.supabaseUrl") || "";
-    let supabaseKey = sessionStorage.getItem("depositDashboard.supabaseKey") || "";
-
-    supabaseUrlInput.value = supabaseUrl;
-    supabaseKeyInput.value = supabaseKey;
-
-    const escapeHtml = (value) => String(value ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-
-    const formatRate = (value) => `${Number(value).toFixed(2)}%`;
-
-    function normalizeUrl(value) {
-      return value.trim().replace(/\/+$/, "");
-    }
-
-    function isForbiddenKey(value) {
-      const key = value.trim();
-      if (key.startsWith("sb_secret_")) return true;
-      if (!key.startsWith("eyJ")) return false;
-      try {
-        const payload = key.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
-        const decoded = JSON.parse(atob(payload));
-        return decoded.role === "service_role";
-      } catch {
-        return false;
-      }
-    }
-
-    function resetDashboard(message) {
-      document.getElementById("institutionCount").textContent = "-";
-      document.getElementById("highestRate").textContent = "-";
-      document.getElementById("highestInstitution").textContent = "연결 설정 필요";
-      document.getElementById("averageRate").textContent = "-";
-      status.className = "status";
-      status.textContent = message;
-      tableBody.innerHTML = '<tr><td colspan="6" class="empty">Supabase 연결 정보를 입력해 주세요.</td></tr>';
-    }
-
-    function renderSummary(rows) {
-      document.getElementById("institutionCount").textContent = `${rows.length}곳`;
-      if (!rows.length) {
-        document.getElementById("highestRate").textContent = "-";
-        document.getElementById("highestInstitution").textContent = "등록된 데이터 없음";
-        document.getElementById("averageRate").textContent = "-";
-        return;
-      }
-      const highest = rows.reduce((best, row) => Number(row.maximum_rate) > Number(best.maximum_rate) ? row : best);
-      const average = rows.reduce((sum, row) => sum + Number(row.maximum_rate), 0) / rows.length;
-      document.getElementById("highestRate").textContent = formatRate(highest.maximum_rate);
-      document.getElementById("highestInstitution").textContent = highest.institution_name;
-      document.getElementById("averageRate").textContent = formatRate(average);
-    }
-
-    function renderTable(rows) {
-      if (!rows.length) {
-        tableBody.innerHTML = '<tr><td colspan="6" class="empty">등록된 정기예금 데이터가 없습니다.</td></tr>';
-        return;
-      }
-      tableBody.innerHTML = rows.map((row) => `
-        <tr>
-          <td class="institution">${escapeHtml(row.institution_name)}</td>
-          <td><span class="badge">${escapeHtml(row.sector_category)}</span></td>
-          <td>${escapeHtml(row.product_name)}</td>
-          <td class="rate">${formatRate(row.base_rate)}</td>
-          <td class="rate max">${formatRate(row.maximum_rate)}</td>
-          <td class="condition">${escapeHtml(row.preferential_conditions || "-")}</td>
-        </tr>
-      `).join("");
-    }
-
-    async function loadRates() {
-      if (!supabaseUrl || !supabaseKey) {
-        resetDashboard("연결되지 않음");
-        return;
-      }
-
-      refreshButton.disabled = true;
-      status.className = "status";
-      status.textContent = "최신 데이터를 불러오는 중...";
-      try {
-        const endpoint = `${supabaseUrl}/rest/v1/deposit_rate_research?select=*&order=maximum_rate.desc,institution_name.asc`;
-        const response = await fetch(endpoint, {
-          headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` }
-        });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const rows = await response.json();
-        renderSummary(rows);
-        renderTable(rows);
-        status.textContent = `${rows.length}건 · ${new Date().toLocaleString("ko-KR")} 갱신`;
-      } catch (error) {
-        console.error(error);
-        status.className = "status error";
-        status.textContent = "데이터를 불러오지 못했습니다.";
-        tableBody.innerHTML = '<tr><td colspan="6" class="empty">잠시 후 새로고침을 눌러 다시 시도해 주세요.</td></tr>';
-      } finally {
-        refreshButton.disabled = false;
-      }
-    }
-
-    configForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const nextUrl = normalizeUrl(supabaseUrlInput.value);
-      const nextKey = supabaseKeyInput.value.trim();
-
-      configMessage.className = "config-message";
-      if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(nextUrl)) {
-        configMessage.className = "config-message error";
-        configMessage.textContent = "올바른 Supabase 프로젝트 URL을 입력해 주세요.";
-        return;
-      }
-      if (isForbiddenKey(nextKey)) {
-        configMessage.className = "config-message error";
-        configMessage.textContent = "비밀키는 브라우저에서 사용할 수 없습니다. publishable 또는 anon 키를 입력하세요.";
-        return;
-      }
-
-      supabaseUrl = nextUrl;
-      supabaseKey = nextKey;
-      sessionStorage.setItem("depositDashboard.supabaseUrl", supabaseUrl);
-      sessionStorage.setItem("depositDashboard.supabaseKey", supabaseKey);
-      configMessage.textContent = "연결 정보를 저장했습니다. 데이터를 확인하고 있습니다.";
-      await loadRates();
-      if (!status.classList.contains("error")) configMessage.textContent = "Supabase에 연결되었습니다.";
-    });
-
-    clearConfigButton.addEventListener("click", () => {
-      sessionStorage.removeItem("depositDashboard.supabaseUrl");
-      sessionStorage.removeItem("depositDashboard.supabaseKey");
-      supabaseUrl = "";
-      supabaseKey = "";
-      supabaseUrlInput.value = "";
-      supabaseKeyInput.value = "";
-      configMessage.className = "config-message";
-      configMessage.textContent = "연결 정보를 초기화했습니다.";
-      resetDashboard("연결되지 않음");
-      supabaseUrlInput.focus();
-    });
-
-    refreshButton.addEventListener("click", loadRates);
-    loadRates();
-  </script>
+<script>
+const TABLES={
+  branches:{label:"지점 관리",desc:"지점과 담당 관리자 정보",pk:["branch_id"],fields:[F("branch_id","지점 ID","number"),F("branch_name","지점명"),F("region","지역"),F("manager_name","관리자명")]},
+  members:{label:"조합원 관리",desc:"조합원 기본정보와 소속 지점",pk:["member_id"],fields:[F("member_id","조합원 번호","number"),F("name","이름"),F("birth_date","생년월일","date"),F("gender","성별","select",["M","F"]),F("join_date","가입일","date"),F("branch_id","지점 ID","number"),F("phone","전화번호","tel")]},
+  deposit_accounts:{label:"예·적금 관리",desc:"계좌 종류·잔액·적용금리",pk:["account_id"],fields:[F("account_id","계좌 ID","number"),F("member_id","조합원 번호","number"),F("branch_id","지점 ID","number"),F("account_type","계좌 종류","select",["보통예금","정기예금","정기적금","자유적금"]),F("open_date","개설일","date"),F("balance","잔액","number"),F("interest_rate","금리(%)","number")]},
+  loans:{label:"대출 관리",desc:"대출 실행정보와 정상·연체·완제 상태",pk:["loan_id"],fields:[F("loan_id","대출 ID","number"),F("member_id","조합원 번호","number"),F("branch_id","지점 ID","number"),F("loan_type","대출 종류","select",["신용대출","전세자금대출","담보대출"]),F("loan_amount","대출금액","number"),F("interest_rate","금리(%)","number"),F("start_date","실행일","date"),F("due_date","만기일","date"),F("status","상태","select",["정상","연체","완제"])]},
+  transactions:{label:"거래내역 관리",desc:"계좌별 입출금 거래내역",pk:["transaction_id"],fields:[F("transaction_id","거래 ID","number"),F("account_id","계좌 ID","number"),F("transaction_date","거래일시","datetime-local"),F("transaction_type","거래 구분","select",["입금","출금"]),F("amount","거래금액","number"),F("balance_after","거래 후 잔액","number")]},
+  deposit_rate_research:{label:"시장금리 관리",desc:"금융기관별 정기예금 금리 조사",pk:["institution_name","product_name"],fields:[F("institution_name","금융기관명"),F("sector_category","권역 분류","select",["시중은행","상호금융","수협계열","저축은행"]),F("product_name","대표 상품명"),F("base_rate","기본금리(연%)","number"),F("maximum_rate","최고우대금리(연%)","number"),F("preferential_conditions","주요 우대 조건","textarea",null,true)]}
+};
+function F(name,label,type="text",options=null,nullable=false){return{name,label,type,options,nullable}}
+let baseUrl=sessionStorage.getItem("mgAdmin.url")||"",apiKey=sessionStorage.getItem("mgAdmin.key")||"",activeTable=null,rows=[],editRecord=null,deleteRecord=null;
+const $=id=>document.getElementById(id); const nav=$("nav"),homeView=$("homeView"),tableView=$("tableView"),toast=$("toast");
+function escapeHtml(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
+function isSecret(k){if(k.startsWith("sb_secret_"))return true;if(!k.startsWith("eyJ"))return false;try{const p=k.split(".")[1].replace(/-/g,"+").replace(/_/g,"/");return JSON.parse(atob(p)).role==="service_role"}catch{return false}}
+function headers(prefer){const h={apikey:apiKey,Authorization:`Bearer ${apiKey}`,"Content-Type":"application/json"};if(prefer)h.Prefer=prefer;return h}
+function endpoint(table,query=""){return `${baseUrl}/rest/v1/${table}${query?`?${query}`:""}`}
+async function api(table,{method="GET",query="",body,prefer="return=representation"}={}){const r=await fetch(endpoint(table,query),{method,headers:headers(prefer),body:body?JSON.stringify(body):undefined});if(!r.ok){let d;try{d=await r.json()}catch{d={message:`HTTP ${r.status}`}}throw new Error(d.message||d.details||`HTTP ${r.status}`)}if(method==="DELETE"&&r.status===204)return[];const text=await r.text();return text?JSON.parse(text):[]}
+function notify(message,error=false){toast.textContent=message;toast.className=`toast show${error?" error":""}`;clearTimeout(notify.timer);notify.timer=setTimeout(()=>toast.className="toast",2800)}
+function renderNav(){nav.innerHTML=`<button class="nav-button active" data-table="">통합 현황</button>`+Object.entries(TABLES).map(([k,v])=>`<button class="nav-button" data-table="${k}">${v.label}</button>`).join("");nav.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;showView(b.dataset.table)})}
+function renderModules(){$("moduleCards").innerHTML=Object.entries(TABLES).map(([k,v])=>`<button class="module-card" data-table="${k}"><strong>${v.label}</strong><span>${v.desc}</span><span class="module-count" id="count-${k}">-</span></button>`).join("");$("moduleCards").onclick=e=>{const b=e.target.closest("button");if(b)showView(b.dataset.table)}}
+function setConnected(ok){const el=$("connectionStatus");el.className=`status-pill${ok?" connected":""}`;el.querySelector("span:last-child").textContent=ok?"연결됨":"연결되지 않음";$("securityBanner").classList.toggle("show",ok)}
+async function loadCounts(){if(!baseUrl||!apiKey)return;let total=0;await Promise.all(Object.keys(TABLES).map(async table=>{try{const data=await api(table,{query:`select=${TABLES[table].pk[0]}`});const n=data.length;total+=n;$(`count-${table}`).textContent=`${n.toLocaleString()}건`}catch{$(`count-${table}`).textContent="조회 실패"}}));$("totalRows").textContent=`${total.toLocaleString()}건`;$("lastUpdated").textContent=new Date().toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"})}
+async function showView(table){document.querySelectorAll(".nav-button").forEach(b=>b.classList.toggle("active",b.dataset.table===table));activeTable=table||null;if(!table){homeView.classList.remove("hidden");tableView.classList.add("hidden");$("pageTitle").textContent="통합 현황";$("pageDesc").textContent="지점·조합원·예적금·대출·거래 데이터를 한곳에서 관리합니다.";await loadCounts();return}homeView.classList.add("hidden");tableView.classList.remove("hidden");$("pageTitle").textContent=TABLES[table].label;$("pageDesc").textContent=TABLES[table].desc;$("tableTitle").textContent=TABLES[table].label;await loadTable()}
+async function loadTable(){if(!activeTable)return;if(!baseUrl||!apiKey){renderEmpty("Supabase 연결 정보를 먼저 입력하세요.");return}$("tableMessage").textContent="데이터를 불러오는 중...";$("tableBody").innerHTML='<tr><td class="empty">불러오는 중...</td></tr>';try{const cfg=TABLES[activeTable];rows=await api(activeTable,{query:`select=*&order=${cfg.pk[0]}.asc&limit=500`});renderTable();$("tableMessage").textContent=`${rows.length.toLocaleString()}건 조회됨`}catch(e){renderEmpty(e.message);$("tableMessage").textContent="조회 실패";notify(e.message,true)}}
+function displayValue(f,v){if(v===null||v===undefined||v==="")return"-";if(["balance","loan_amount","amount","balance_after"].includes(f.name))return Number(v).toLocaleString("ko-KR");if(["interest_rate","base_rate","maximum_rate"].includes(f.name))return `${Number(v).toFixed(2)}%`;if(f.name==="status"||f.name==="sector_category")return `<span class="badge">${escapeHtml(v)}</span>`;return escapeHtml(v)}
+function renderTable(){const cfg=TABLES[activeTable];$("tableHead").innerHTML=`<tr>${cfg.fields.map(f=>`<th>${f.label}</th>`).join("")}<th>관리</th></tr>`;if(!rows.length){renderEmpty("등록된 데이터가 없습니다.");return}$("tableBody").innerHTML=rows.map((row,i)=>`<tr>${cfg.fields.map(f=>`<td class="${f.type==="number"?"number":""}">${displayValue(f,row[f.name])}</td>`).join("")}<td><div class="row-actions"><button class="btn btn-secondary btn-small" data-action="edit" data-index="${i}">수정</button><button class="btn btn-danger btn-small" data-action="delete" data-index="${i}">삭제</button></div></td></tr>`).join("")}
+function renderEmpty(message){$("tableHead").innerHTML="";$("tableBody").innerHTML=`<tr><td class="empty">${escapeHtml(message)}</td></tr>`}
+async function suggestId(cfg){if(cfg.pk.length!==1)return"";const f=cfg.fields.find(x=>x.name===cfg.pk[0]);if(f?.type!=="number")return"";try{const d=await api(activeTable,{query:`select=${f.name}&order=${f.name}.desc&limit=1`});return d.length?Number(d[0][f.name])+1:1}catch{return""}}
+async function openForm(record=null){editRecord=record;const cfg=TABLES[activeTable];$("dialogTitle").textContent=record?`${cfg.label} 수정`:`${cfg.label} 신규 등록`;const suggested=record?"":await suggestId(cfg);$("formFields").innerHTML=cfg.fields.map(f=>{const isPk=cfg.pk.includes(f.name),value=record?.[f.name]??(isPk?suggested:"");let control;if(f.type==="select")control=`<select name="${f.name}" ${record&&isPk?"disabled":""} ${f.nullable?"":"required"}><option value="">선택</option>${f.options.map(o=>`<option value="${escapeHtml(o)}" ${String(value).trim()===o?"selected":""}>${o}</option>`).join("")}</select>`;else if(f.type==="textarea")control=`<textarea name="${f.name}" ${f.nullable?"":"required"}>${escapeHtml(value)}</textarea>`;else{let formatted=value;if(f.type==="datetime-local"&&value)formatted=String(value).slice(0,16);control=`<input name="${f.name}" type="${f.type}" value="${escapeHtml(formatted)}" ${record&&isPk?"disabled":""} ${f.type==="number"?'step="any"':""} ${f.nullable?"":"required"}>`}return`<div class="field ${f.type==="textarea"?"wide":""}"><label>${f.label}${isPk?" (PK)":""}</label>${control}</div>`}).join("");$("recordDialog").showModal()}
+function recordFilter(record){return TABLES[activeTable].pk.map(k=>`${encodeURIComponent(k)}=eq.${encodeURIComponent(record[k])}`).join("&")}
+function formPayload(form){const cfg=TABLES[activeTable],data={};for(const f of cfg.fields){if(editRecord&&cfg.pk.includes(f.name))continue;const el=form.elements[f.name];if(!el)continue;let v=el.value.trim();if(v===""&&f.nullable){data[f.name]=null;continue}if(f.type==="number")v=Number(v);if(f.type==="datetime-local"&&v)v=v.replace("T"," ")+":00";data[f.name]=v}return data}
+async function saveRecord(e){e.preventDefault();const cfg=TABLES[activeTable],payload=formPayload(e.target);$("saveButton").disabled=true;try{if(editRecord)await api(activeTable,{method:"PATCH",query:recordFilter(editRecord),body:payload});else await api(activeTable,{method:"POST",body:payload});$("recordDialog").close();notify(editRecord?"수정했습니다.":"등록했습니다.");await loadTable()}catch(err){notify(err.message,true)}finally{$("saveButton").disabled=false}}
+function openDelete(record){deleteRecord=record;const cfg=TABLES[activeTable];$("deleteRecordLabel").textContent=cfg.pk.map(k=>`${k}: ${record[k]}`).join(" · ");$("deleteDialog").showModal()}
+async function confirmDelete(){if(!deleteRecord)return;$("confirmDelete").disabled=true;try{await api(activeTable,{method:"DELETE",query:recordFilter(deleteRecord),prefer:"return=minimal"});$("deleteDialog").close();notify("삭제했습니다.");await loadTable()}catch(err){notify(err.message,true)}finally{$("confirmDelete").disabled=false;deleteRecord=null}}
+$("setupForm").onsubmit=async e=>{e.preventDefault();const u=$("urlInput").value.trim().replace(/\/+$/,"");const k=$("keyInput").value.trim();$("setupMessage").className="message";if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(u)){$("setupMessage").className="message error";$("setupMessage").textContent="올바른 Supabase 프로젝트 URL을 입력하세요.";return}if(isSecret(k)){$("setupMessage").className="message error";$("setupMessage").textContent="secret/service_role 키는 사용할 수 없습니다.";return}baseUrl=u;apiKey=k;sessionStorage.setItem("mgAdmin.url",u);sessionStorage.setItem("mgAdmin.key",k);$("setupMessage").textContent="연결을 확인하는 중...";try{await api("branches",{query:"select=branch_id&limit=1"});setConnected(true);$("setupMessage").textContent="연결되었습니다.";await showView(activeTable||"")}catch(err){setConnected(false);$("setupMessage").className="message error";$("setupMessage").textContent=err.message}}
+$("resetButton").onclick=()=>{sessionStorage.removeItem("mgAdmin.url");sessionStorage.removeItem("mgAdmin.key");baseUrl=apiKey="";$("urlInput").value=$("keyInput").value="";setConnected(false);$("setupMessage").textContent="연결 정보를 초기화했습니다.";showView("")}
+$("reloadButton").onclick=loadTable;$("addButton").onclick=()=>openForm();$("recordForm").onsubmit=saveRecord;$("closeDialog").onclick=$("cancelDialog").onclick=()=>$("recordDialog").close();$("closeDelete").onclick=$("cancelDelete").onclick=()=>$("deleteDialog").close();$("confirmDelete").onclick=confirmDelete;
+$("tableBody").onclick=e=>{const b=e.target.closest("button[data-action]");if(!b)return;const r=rows[Number(b.dataset.index)];b.dataset.action==="edit"?openForm(r):openDelete(r)};
+$("urlInput").value=baseUrl;$("keyInput").value=apiKey;renderNav();renderModules();setConnected(Boolean(baseUrl&&apiKey));showView("");
+</script>
 </body>
 </html>
